@@ -1,0 +1,49 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model GasLeakAlert {
+  alertLevel String?
+  alertTime  DateTime?
+  createdAt  DateTime  @default(now())
+  id         String    @id @default(cuid())
+  sensor     Sensor?   @relation(fields: [sensorId], references: [id])
+  sensorId   String?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Location {
+  coordinates String?
+  createdAt   DateTime @default(now())
+  id          String   @id @default(cuid())
+  name        String?
+  sensors     Sensor[]
+  updatedAt   DateTime @updatedAt
+}
+
+model Sensor {
+  createdAt       DateTime         @default(now())
+  gasLeakAlerts   GasLeakAlert[]
+  id              String           @id @default(cuid())
+  location        Location?        @relation(fields: [locationId], references: [id])
+  locationId      String?
+  maintenanceLogs MaintenanceLog[]
+  serialNumber    String?
+  typeField       String?
+  updatedAt       DateTime         @updatedAt
+}
+
+model MaintenanceLog {
+  createdAt       DateTime  @default(now())
+  description     String?
+  id              String    @id @default(cuid())
+  maintenanceDate DateTime?
+  sensor          Sensor?   @relation(fields: [sensorId], references: [id])
+  sensorId        String?
+  updatedAt       DateTime  @updatedAt
+}
